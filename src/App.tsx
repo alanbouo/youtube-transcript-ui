@@ -1,3 +1,4 @@
+// App.tsx
 import React, { useState } from "react";
 import axios from "axios";
 
@@ -6,7 +7,7 @@ function extractVideoId(url: string): string | null {
   return match ? match[1] : null;
 }
 
-function App() {
+export default function App() {
   const [url, setUrl] = useState("");
   const [proxyHost, setProxyHost] = useState("");
   const [proxyPort, setProxyPort] = useState("");
@@ -20,20 +21,20 @@ function App() {
     setError("");
     setTranscript("");
     setLoading(false);
-  
+
     if (!url || !proxyHost || !proxyPort || !proxyUser || !proxyPass) {
-      setError("Tous les champs sont obligatoires.");
+      setError("All fields are required.");
       return;
     }
-  
+
     const videoId = extractVideoId(url);
     if (!videoId) {
-      setError("URL YouTube invalide.");
+      setError("Invalid YouTube URL.");
       return;
     }
-  
+
     setLoading(true);
-  
+
     try {
       const response = await axios.post("https://yt.alanbouo.com/transcript", {
         video_id: videoId,
@@ -42,53 +43,96 @@ function App() {
         proxy_username: proxyUser,
         proxy_password: proxyPass
       });
-  
+
       setTranscript(response.data.transcript);
     } catch (err: any) {
-      setError(err.response?.data?.detail || "Erreur lors de l'appel à l'API.");
+      setError(err.response?.data?.detail || "An error occurred while calling the API.");
     } finally {
       setLoading(false);
     }
   };
-  
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6 text-center">🎥 Transcripteur YouTube</h1>
+    <main className="min-h-screen bg-gray-50 flex flex-col items-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-xl w-full space-y-6">
+        <header className="text-center">
+          <h1 className="text-4xl font-bold tracking-tight text-gray-900">YouTube Transcript Tool</h1>
+          <p className="mt-2 text-gray-600">Paste a YouTube URL and your proxy info to retrieve the transcript.</p>
+        </header>
 
-      <div className="space-y-4">
-        <input type="text" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="URL de la vidéo YouTube"
-          className="w-full p-2 border rounded" />
+        <div className="bg-white p-6 rounded-lg shadow space-y-4">
+          <div>
+            <label htmlFor="url" className="block text-sm font-medium text-gray-700">YouTube URL</label>
+            <input
+              type="text"
+              id="url"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              placeholder="https://www.youtube.com/watch?v=..."
+            />
+          </div>
 
-        <input type="text" value={proxyHost} onChange={(e) => setProxyHost(e.target.value)} placeholder="Proxy host (IP publique)"
-          className="w-full p-2 border rounded" />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Proxy Host</label>
+              <input
+                type="text"
+                value={proxyHost}
+                onChange={(e) => setProxyHost(e.target.value)}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Proxy Port</label>
+              <input
+                type="number"
+                value={proxyPort}
+                onChange={(e) => setProxyPort(e.target.value)}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Username</label>
+              <input
+                type="text"
+                value={proxyUser}
+                onChange={(e) => setProxyUser(e.target.value)}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Password</label>
+              <input
+                type="password"
+                value={proxyPass}
+                onChange={(e) => setProxyPass(e.target.value)}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+          </div>
 
-        <input type="text" value={proxyPort} onChange={(e) => setProxyPort(e.target.value)} placeholder="Proxy port (ex: 3128)"
-          className="w-full p-2 border rounded" />
+          <button
+            onClick={handleSubmit}
+            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition"
+          >
+            Get Transcript
+          </button>
 
-        <input type="text" value={proxyUser} onChange={(e) => setProxyUser(e.target.value)} placeholder="Proxy username"
-          className="w-full p-2 border rounded" />
-
-        <input type="password" value={proxyPass} onChange={(e) => setProxyPass(e.target.value)} placeholder="Proxy password"
-          className="w-full p-2 border rounded" />
-
-        <button onClick={handleSubmit} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-          Obtenir le transcript
-        </button>
-      </div>
-
-      {loading && <p className="text-gray-600 mt-4">⏳ Chargement...</p>}
-      {error && <p className="text-red-600 mt-4">{error}</p>}
-      {transcript && (
-        <div className="mt-6">
-          <h2 className="text-xl font-semibold mb-2">Transcript</h2>
-          <pre className="bg-white p-4 border rounded max-h-[500px] overflow-y-auto whitespace-pre-wrap text-sm">
-            {transcript}
-          </pre>
+          {error && <p className="text-sm text-red-600 text-center mt-2">{error}</p>}
         </div>
-      )}
-    </div>
+
+        {loading && <p className="text-gray-500 text-center">Loading...</p>}
+
+        {transcript && (
+          <div className="bg-white p-6 rounded-lg shadow">
+            <h2 className="text-lg font-semibold mb-2">Transcript</h2>
+            <pre className="whitespace-pre-wrap text-sm text-gray-800 max-h-[500px] overflow-y-auto">
+              {transcript}
+            </pre>
+          </div>
+        )}
+      </div>
+    </main>
   );
 }
-
-export default App;
