@@ -1,42 +1,57 @@
 // App.tsx
 import React, { useState } from "react";
 import axios from "axios";
+import { TranscriptResult } from "./components/TranscriptResult";
 
 function extractVideoId(url: string): string | null {
   const match = url.match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
   return match ? match[1] : null;
 }
 
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 export default function App() {
   const [url, setUrl] = useState("");
-  const [proxyHost, setProxyHost] = useState("");
-  const [proxyPort, setProxyPort] = useState("");
-  const [proxyUser, setProxyUser] = useState("");
-  const [proxyPass, setProxyPass] = useState("");
+  const [proxyHost, setProxyHost] = useState(import.meta.env.VITE_PROXY_HOST);
+  const [proxyPort, setProxyPort] = useState(import.meta.env.VITE_PROXY_PORT);
+  const [proxyUser, setProxyUser] = useState(import.meta.env.VITE_PROXY_USER);
+  const [proxyPass, setProxyPass] = useState(import.meta.env.VITE_PROXY_PASS);
+
   const [transcript, setTranscript] = useState("");
+  const [summary, setSummary] = useState("");
+  const [keywords, setKeywords] = useState<string[]>([]);
+  const [actions, setActions] = useState<string[]>([]);
+  const [hasResults, setHasResults] = useState(false);
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
     setError("");
     setTranscript("");
-    setLoading(false);
-
+    setSummary("");
+    setKeywords([]);
+    setActions([]);
+    setHasResults(false);
+    setLoading(true);
+  
     if (!url || !proxyHost || !proxyPort || !proxyUser || !proxyPass) {
       setError("All fields are required.");
       return;
     }
-
+  
     const videoId = extractVideoId(url);
     if (!videoId) {
       setError("Invalid YouTube URL.");
       return;
     }
-
-    setLoading(true);
+    
+    const API_BASE = "https://yt-summary.alanbouo.com";
+    const API_KEY = import.meta.env.VITE_API_KEY;
 
     try {
-      const response = await axios.post("https://yt.alanbouo.com/transcript", {
+      // 1. Get transcript depuis ton autre API
+      const transcriptRes = await axios.post("https://yt.alanbouo.com/transcript", {
         video_id: videoId,
         proxy_host: proxyHost,
         proxy_port: Number(proxyPort),
@@ -44,9 +59,46 @@ export default function App() {
         proxy_password: proxyPass
       });
 
-      setTranscript(response.data.transcript);
+      const transcript = transcriptRes.data.transcript;
+      setTranscript(transcript);
+
+      // 2. Trigger analyze via /analyze
+      await axios.post(`${API_BASE}/analyze`, {
+        video_id: videoId,
+        transcript: transcript
+      }, {
+        headers: {
+          "x-api-key": API_KEY
+        }
+      });
+
+      // 3. Attendre que n8n ait terminé
+      await delay(5000); // Premier délai de 5 secondes
+      await delay(5000); // Deuxième délai de 5 secondes
+
+      // 4. Récupérer le résultat
+      const resultRes = await axios.get(`${API_BASE}/result`, {
+        params: { video_id: videoId },
+        headers: {
+          "x-api-key": API_KEY
+        }
+      });
+
+      setSummary(resultRes.data.summary || "");
+      setKeywords(resultRes.data.keywords || []);
+      setActions(resultRes.data.actions || []);
+      setHasResults(true);
     } catch (err: any) {
-      setError(err.response?.data?.detail || "An error occurred while calling the API.");
+      console.error("API Error:", err);
+    
+      if (err.response) {
+        const status = err.response.status;
+        const detail = err.response.data?.detail || JSON.stringify(err.response.data);
+    
+        setError(`Erreur API (${status}) : ${detail}`);
+      } else {
+        setError("Erreur inconnue lors de l'appel API.");
+      }
     } finally {
       setLoading(false);
     }
@@ -116,13 +168,19 @@ export default function App() {
             onClick={handleSubmit}
             className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition"
           >
-            Get Transcript
+            Get Transcript & AI Summary
           </button>
 
           {error && <p className="text-sm text-red-600 text-center mt-2">{error}</p>}
         </div>
 
         {loading && <p className="text-gray-500 text-center">Loading...</p>}
+        
+        {hasResults && (
+          <TranscriptResult 
+            videoId={extractVideoId(url) || ""} 
+          />
+        )}
 
         {transcript && (
           <div className="bg-white p-6 rounded-lg shadow">
