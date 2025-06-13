@@ -1,0 +1,29 @@
+{
+  "name": "youtube-transcript-ui",
+  "description": "UI pour obtenir les transcriptions et résumés de vidéos YouTube",
+  "version": "1.0.0",
+  "type": "web",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "."
+  },
+  "ports": {
+    "80": {
+      "protocol": "http",
+      "exposed": true
+    }
+  },
+  "env": {
+    "VITE_API_KEY": "${VITE_API_KEY}",
+    "VITE_PROXY_HOST": "${VITE_PROXY_HOST}",
+    "VITE_PROXY_PORT": "${VITE_PROXY_PORT}",
+    "VITE_PROXY_USER": "${VITE_PROXY_USER}",
+    "VITE_PROXY_PASS": "${VITE_PROXY_PASS}"
+  },
+  "healthcheck": {
+    "path": "/",
+    "interval": "30s",
+    "timeout": "5s",
+    "retries": 3
+  }
+}
