@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: youtube-transcript-ui
+    restart: unless-stopped
+    ports:
+      - "3000:80"  # Mappez le port 80 du conteneur vers le port 3000 de l'hôte
+    environment:
+      - NODE_ENV=production
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
