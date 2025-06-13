@@ -10,6 +10,9 @@ FROM nginx:alpine
 # Copier la configuration NGINX
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
+# Copier les types MIME
+COPY --from=builder /app/node_modules/mime-types/index.js /etc/nginx/mime.types
+
 # Copier les fichiers construits
 COPY --from=builder /app/dist /usr/share/nginx/html
 
