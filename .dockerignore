@@ -1,9 +1,7 @@
 node_modules
-.env
 .git
 .gitignore
+.env
 README.md
-package-lock.json
-npm-debug.log
 *.log
 .DS_Store
