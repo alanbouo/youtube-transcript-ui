@@ -6,20 +6,26 @@ RUN npm install
 COPY . .
 RUN npm run build
 
+# Vérifier la structure du répertoire de build
+RUN ls -la /app/dist
+
 FROM nginx:alpine
 
-# Copy nginx config
+# Copier la configuration NGINX
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copy built assets from builder
+# Copier les fichiers construits
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Set permissions
+# Vérifier les fichiers copiés
+RUN ls -la /usr/share/nginx/html
+
+# Définir les permissions
 RUN chown -R nginx:nginx /usr/share/nginx/html && \
     chmod -R 755 /usr/share/nginx/html
 
-# Expose port 80
+# Exposer le port 80
 EXPOSE 80
 
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Démarrer NGINX
+CMD ["nginx", "-g", "daemon off;", "-c", "/etc/nginx/nginx.conf"]
