@@ -1,4 +1,3 @@
-# Dockerfile
 FROM node:18 AS builder
 WORKDIR /app
 COPY package*.json ./
@@ -6,19 +5,13 @@ RUN npm install
 COPY . .
 RUN npm run build
 
-# Vérifier la structure du répertoire de build
-RUN ls -la /app/dist
-
 FROM nginx:alpine
 
-# Copier la configuration NGINX
+# Copier la configuration NGINX personnalisée
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copier les fichiers construits
 COPY --from=builder /app/dist /usr/share/nginx/html
-
-# Vérifier les fichiers copiés
-RUN ls -la /usr/share/nginx/html
 
 # Définir les permissions
 RUN chown -R nginx:nginx /usr/share/nginx/html && \
@@ -28,4 +21,4 @@ RUN chown -R nginx:nginx /usr/share/nginx/html && \
 EXPOSE 80
 
 # Démarrer NGINX
-CMD ["nginx", "-g", "daemon off;", "-c", "/etc/nginx/nginx.conf"]
+CMD ["nginx", "-g", "daemon off;"]
