@@ -14,5 +14,8 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
 
+# Installer des outils de diagnostic
+RUN apk add --no-cache net-tools procps
+
 EXPOSE 9000
 CMD ["/start.sh"]
