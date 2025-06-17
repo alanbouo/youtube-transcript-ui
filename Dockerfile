@@ -3,7 +3,8 @@ FROM node:20 AS builder
 WORKDIR /app
 COPY . .
 RUN npm install
-RUN npm run build
+RUN npm run build  # Ceci devrait créer une version de production dans /app/dist
+
 
 # Serve via nginx
 FROM nginx:stable-alpine
