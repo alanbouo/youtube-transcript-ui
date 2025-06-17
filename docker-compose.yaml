@@ -6,7 +6,7 @@ services:
     container_name: youtube-transcript-ui
     restart: unless-stopped
     ports:
-      - "3000:8080"
+      - "3000:8081"
     environment:
       - NODE_ENV=production
     networks:
