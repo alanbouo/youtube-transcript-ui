@@ -29,4 +29,15 @@ nginx -t
 
 # Démarrer Nginx
 echo "Starting Nginx..."
-nginx -g 'daemon off;'
+nginx -g 'daemon off;' &
+
+# Attendre que Nginx démarre complètement
+echo "Waiting for Nginx to start..."
+sleep 5
+
+# Vérifier à nouveau les ports en écoute
+echo "Checking listening ports after Nginx start:"
+netstat -tlnp
+
+# Garder le conteneur en vie
+wait
