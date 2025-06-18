@@ -1,22 +1,18 @@
-# Build step
-FROM node:20 AS builder
+# Étape 1 : build de l'app Vite
+FROM node:20-alpine AS builder
+
 WORKDIR /app
+
 COPY . .
-RUN npm install
-RUN npm run build  # Ceci devrait créer une version de production dans /app/dist
 
+RUN npm install && npm run build
 
-# Serve via nginx
-FROM nginx:stable-alpine
+# Étape 2 : image nginx pour servir le contenu
+FROM nginx:alpine
+
 COPY --from=builder /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copier un script de démarrage personnalisé
-COPY start.sh /start.sh
-RUN chmod +x /start.sh
-
-# Installer des outils de diagnostic
-RUN apk add --no-cache net-tools procps
-
 EXPOSE 9000
-CMD ["/start.sh"]
+
+CMD ["nginx", "-g", "daemon off;"]
