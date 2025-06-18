@@ -77,6 +77,7 @@ export default function App() {
       await delay(5000); // Deuxième délai de 5 secondes
 
       // 4. Récupérer le résultat
+      console.log("📦 videoId (prod):", JSON.stringify(videoId));
       const resultRes = await axios.get(`${API_BASE}/result`, {
         params: { video_id: videoId },
         headers: {
