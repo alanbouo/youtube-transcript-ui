@@ -27,84 +27,79 @@ export default function App() {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
-    setError("");
-    setTranscript("");
-    setSummary("");
-    setKeywords([]);
-    setActions([]);
-    setHasResults(false);
-    setLoading(true);
-  
-    if (!url || !proxyHost || !proxyPort || !proxyUser || !proxyPass) {
-      setError("All fields are required.");
-      return;
+  setError("");
+  setTranscript("");
+  setSummary("");
+  setKeywords([]);
+  setActions([]);
+  setHasResults(false);
+  setLoading(true);
+
+  if (!url || !proxyHost || !proxyPort || !proxyUser || !proxyPass) {
+    setError("All fields are required.");
+    return;
+  }
+
+  const videoId = extractVideoId(url);
+  if (!videoId) {
+    setError("Invalid YouTube URL.");
+    return;
+  }
+
+  const API_BASE = "https://yt-summary.alanbouo.com";
+
+  try {
+    // 1. Récupérer le transcript
+    const transcriptRes = await axios.post("https://yt.alanbouo.com/transcript", {
+      video_id: videoId,
+      proxy_host: proxyHost,
+      proxy_port: Number(proxyPort),
+      proxy_username: proxyUser,
+      proxy_password: proxyPass
+    });
+
+    const transcript = transcriptRes.data.transcript;
+    setTranscript(transcript);
+
+    // 2. Appel à /analyze (plus besoin de clé API dans ce scénario, si la sécurité est assurée par IP ou auth serveur)
+    const analyzeRes = await axios.post(`${API_BASE}/analyze`, {
+      video_id: videoId,
+      transcript: transcript
+    });
+
+    const token = analyzeRes.data.token;
+    if (!token) {
+      throw new Error("Aucun token reçu depuis /analyze");
     }
-  
-    const videoId = extractVideoId(url);
-    if (!videoId) {
-      setError("Invalid YouTube URL.");
-      return;
+
+    // 3. Attente (tu peux améliorer avec polling ensuite)
+    await delay(10000);
+
+    // 4. Récupération du résultat par token
+    const resultRes = await axios.get(`${API_BASE}/result`, {
+      params: { token }
+    });
+
+    setSummary(resultRes.data.summary || "");
+    setKeywords(resultRes.data.keywords || []);
+    setActions(resultRes.data.actions || []);
+    setHasResults(true);
+  } catch (err: any) {
+    console.error("API Error:", err);
+
+    if (err.response) {
+      const status = err.response.status;
+      const detail = err.response.data?.detail || JSON.stringify(err.response.data);
+
+      setError(`Erreur API (${status}) : ${detail}`);
+    } else {
+      setError("Erreur inconnue lors de l'appel API.");
     }
-    
-    const API_BASE = "https://yt-summary.alanbouo.com";
-    const API_KEY = import.meta.env.VITE_API_KEY;
+  } finally {
+    setLoading(false);
+  }
+};
 
-    try {
-      // 1. Get transcript depuis ton autre API
-      const transcriptRes = await axios.post("https://yt.alanbouo.com/transcript", {
-        video_id: videoId,
-        proxy_host: proxyHost,
-        proxy_port: Number(proxyPort),
-        proxy_username: proxyUser,
-        proxy_password: proxyPass
-      });
-
-      const transcript = transcriptRes.data.transcript;
-      setTranscript(transcript);
-
-      // 2. Trigger analyze via /analyze
-      await axios.post(`${API_BASE}/analyze`, {
-        video_id: videoId,
-        transcript: transcript
-      }, {
-        headers: {
-          "x-api-key": API_KEY
-        }
-      });
-
-      // 3. Attendre que n8n ait terminé
-      await delay(5000); // Premier délai de 5 secondes
-      await delay(5000); // Deuxième délai de 5 secondes
-
-      // 4. Récupérer le résultat
-      console.log("📦 videoId (prod):", JSON.stringify(videoId));
-      console.log("🔐 API_KEY:", API_KEY?.slice(0, 8), "(masqué)");
-      const resultRes = await axios.get(`${API_BASE}/result`, {
-        params: { video_id: videoId },
-        headers: {
-          "x-api-key": API_KEY
-        }
-      });
-
-      setSummary(resultRes.data.summary || "");
-      setKeywords(resultRes.data.keywords || []);
-      setActions(resultRes.data.actions || []);
-      setHasResults(true);
-    } catch (err: any) {
-      console.error("API Error:", err);
-    
-      if (err.response) {
-        const status = err.response.status;
-        const detail = err.response.data?.detail || JSON.stringify(err.response.data);
-    
-        setError(`Erreur API (${status}) : ${detail}`);
-      } else {
-        setError("Erreur inconnue lors de l'appel API.");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <main className="min-h-screen bg-gray-50 flex flex-col items-center py-12 px-4 sm:px-6 lg:px-8">
