@@ -78,6 +78,7 @@ export default function App() {
 
       // 4. Récupérer le résultat
       console.log("📦 videoId (prod):", JSON.stringify(videoId));
+      console.log("🔐 API_KEY:", API_KEY?.slice(0, 8), "(masqué)");
       const resultRes = await axios.get(`${API_BASE}/result`, {
         params: { video_id: videoId },
         headers: {
