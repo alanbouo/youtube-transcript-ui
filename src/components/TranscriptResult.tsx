@@ -32,15 +32,15 @@ export function TranscriptResult({ token }: Props) {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow">
-      <h2 className="text-xl font-semibold mb-2">Résumé IA</h2>
+      <h2 className="text-xl font-semibold mb-2">IA Summary:</h2>
       <p className="mb-4">{summary || "No summary available."}</p>
 
-      <h3 className="font-bold">Mots-clés :</h3>
+      <h3 className="font-bold">Keywords:</h3>
       <ul className="list-disc list-inside">
         {keywords.map((kw, i) => <li key={i}>{kw}</li>)}
       </ul>
 
-      <h3 className="font-bold mt-4">Actions suggérées :</h3>
+      <h3 className="font-bold mt-4">Suggested actions:</h3>
       <ul className="list-disc list-inside">
         {actions.map((act, i) => <li key={i}>{act}</li>)}
       </ul>
