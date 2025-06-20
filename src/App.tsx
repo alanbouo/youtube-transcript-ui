@@ -18,6 +18,7 @@ export default function App() {
   const [proxyPass, setProxyPass] = useState(import.meta.env.VITE_PROXY_PASS);
 
   const [transcript, setTranscript] = useState("");
+  const [token, setToken] = useState("");
   const [summary, setSummary] = useState("");
   const [keywords, setKeywords] = useState<string[]>([]);
   const [actions, setActions] = useState<string[]>([]);
@@ -66,7 +67,7 @@ export default function App() {
       video_id: videoId,
       transcript: transcript
     });
-
+    setToken(analyzeRes.data.token)
     const token = analyzeRes.data.token;
     if (!token) {
       throw new Error("Aucun token reçu depuis /analyze");
@@ -174,9 +175,7 @@ export default function App() {
         {loading && <p className="text-gray-500 text-center">Loading...</p>}
         
         {hasResults && (
-          <TranscriptResult 
-            videoId={extractVideoId(url) || ""} 
-          />
+          <TranscriptResult token={token} />
         )}
 
         {transcript && (
