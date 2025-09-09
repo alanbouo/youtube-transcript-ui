@@ -12,10 +12,6 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export default function App() {
   const [url, setUrl] = useState("");
-  const [proxyHost, setProxyHost] = useState(import.meta.env.VITE_PROXY_HOST);
-  const [proxyPort, setProxyPort] = useState(import.meta.env.VITE_PROXY_PORT);
-  const [proxyUser, setProxyUser] = useState(import.meta.env.VITE_PROXY_USER);
-  const [proxyPass, setProxyPass] = useState(import.meta.env.VITE_PROXY_PASS);
 
   const [transcript, setTranscript] = useState("");
   const [token, setToken] = useState("");
@@ -36,8 +32,8 @@ export default function App() {
   setHasResults(false);
   setLoading(true);
 
-  if (!url || !proxyHost || !proxyPort || !proxyUser || !proxyPass) {
-    setError("All fields are required.");
+  if (!url) {
+    setError("Please enter a YouTube URL.");
     return;
   }
 
@@ -52,11 +48,7 @@ export default function App() {
   try {
     // 1. Récupérer le transcript
     const transcriptRes = await axios.post("https://yt.alanbouo.com/transcript", {
-      video_id: videoId,
-      proxy_host: proxyHost,
-      proxy_port: Number(proxyPort),
-      proxy_username: proxyUser,
-      proxy_password: proxyPass
+      video_id: videoId
     });
 
     const transcript = transcriptRes.data.transcript;
@@ -107,7 +99,7 @@ export default function App() {
       <div className="max-w-xl w-full space-y-6">
         <header className="text-center">
           <h1 className="text-4xl font-bold tracking-tight text-gray-900">YouTube Transcript Tool</h1>
-          <p className="mt-2 text-gray-600">Paste a YouTube URL and your proxy info to retrieve the transcript.</p>
+          <p className="mt-2 text-gray-600">Paste a YouTube URL to retrieve the transcript and AI summary.</p>
         </header>
 
         <div className="bg-white p-6 rounded-lg shadow space-y-4">
@@ -123,44 +115,7 @@ export default function App() {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Proxy Host</label>
-              <input
-                type="text"
-                value={proxyHost}
-                onChange={(e) => setProxyHost(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Proxy Port</label>
-              <input
-                type="number"
-                value={proxyPort}
-                onChange={(e) => setProxyPort(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Username</label>
-              <input
-                type="text"
-                value={proxyUser}
-                onChange={(e) => setProxyUser(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Password</label>
-              <input
-                type="password"
-                value={proxyPass}
-                onChange={(e) => setProxyPass(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-          </div>
+
 
           <button
             onClick={handleSubmit}
