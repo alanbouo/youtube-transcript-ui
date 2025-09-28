@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import { TranscriptResult } from "./components/TranscriptResult";
 
+import logoUrl from "./assets/logo.png";
+
 function extractVideoId(url: string): string | null {
   const match = url.match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
   return match ? match[1] : null;
@@ -101,11 +103,7 @@ export default function App() {
       <header className="border-b border-gray-100 bg-white/90 px-6 py-4 shadow-sm backdrop-blur">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:gap-10">
           <div className="flex items-center space-x-3 md:flex-shrink-0">
-            <div className="w-8 h-8 bg-red-600 rounded flex items-center justify-center">
-              <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z"/>
-              </svg>
-            </div>
+            <img src={logoUrl} alt="TubeChat AI" className="w-16 h-16 rounded" />
             <div>
               <h1 className="text-xl font-bold text-gray-900">TubeChat AI</h1>
               <p className="text-sm text-gray-600">Paste a YouTube URL to get transcript and AI summary</p>
