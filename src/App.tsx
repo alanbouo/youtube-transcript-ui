@@ -231,23 +231,36 @@ export default function App() {
       <footer className="border-t border-gray-200 bg-white/90 py-6">
         <div className="mx-auto w-full max-w-5xl px-6">
           <div className="flex flex-col items-center gap-3 text-sm text-gray-500 md:flex-row md:justify-between">
-            <div className="flex flex-wrap items-center justify-center gap-2 text-gray-600">
-              <a
-                href="https://alanbouo.com"
-                className="font-semibold text-gray-700 transition-colors hover:text-blue-600"
-              >
-                TubeChat AI
-              </a>
-              <span className="hidden text-gray-300 md:inline">|</span>
-              <span className="flex items-center gap-1">
-                © 2025
+            <div className="flex flex-col md:flex-row items-center justify-center gap-2 text-gray-600">
+              <div className="flex flex-wrap items-center justify-center gap-2">
                 <a
                   href="https://alanbouo.com"
-                  className="text-blue-600 transition-colors hover:text-blue-700"
+                  className="font-semibold text-gray-700 transition-colors hover:text-blue-600"
                 >
-                  alanbouo.com
+                  TubeChat AI
                 </a>
-              </span>
+                <span className="hidden text-gray-300 md:inline">|</span>
+                <span className="flex items-center gap-1">
+                  © 2025
+                  <a
+                    href="https://alanbouo.com"
+                    className="text-blue-600 transition-colors hover:text-blue-700"
+                  >
+                    alanbouo.com
+                  </a>
+                </span>
+              </div>
+              <div className="flex items-center gap-1 text-gray-500">
+                <span className="text-gray-300">|</span>
+                <a
+                  href="https://www.buymeacoffee.com/alanbouo"
+                  className="transition-colors hover:text-yellow-600"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  ☕ Buy me a coffee
+                </a>
+              </div>
             </div>
 
             <nav className="flex flex-wrap items-center justify-center gap-4 text-gray-600">
