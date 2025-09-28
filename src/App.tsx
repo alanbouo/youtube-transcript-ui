@@ -67,7 +67,7 @@ export default function App() {
       }
 
       // 3. Attente (tu peux améliorer avec polling ensuite)
-      await delay(10000);
+      await delay(20000);
 
       // 4. Récupération du résultat par token
       const resultRes = await axios.get(`${API_BASE}/result`, {
