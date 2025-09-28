@@ -5,12 +5,12 @@ import { TranscriptResult } from "./components/TranscriptResult";
 
 import logoUrl from "./assets/logo.png";
 
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 function extractVideoId(url: string): string | null {
   const match = url.match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
   return match ? match[1] : null;
 }
-
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export default function App() {
   const [url, setUrl] = useState("");
@@ -24,6 +24,7 @@ export default function App() {
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
 
   const handleSubmit = async () => {
     setError("");
@@ -112,28 +113,28 @@ export default function App() {
 
           {/* Header Navigation */}
           <nav className="flex flex-wrap items-center gap-3 md:ml-auto md:gap-8">
-            <button className="flex flex-col items-center space-y-1 text-blue-600">
+            <button onClick={() => setPopupMessage("This functionality will come later")} className="flex flex-col items-center space-y-1 text-blue-600">
               <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4.5-1 13.5 1V4c0-1.1-.9-2-2-2zm-2 15l-5-1V6l5 11z"/>
               </svg>
               <span className="text-xs">Chat</span>
             </button>
 
-            <button className="flex flex-col items-center space-y-1 text-gray-500 transition-colors hover:text-blue-600">
+            <button onClick={() => setPopupMessage("This functionality will come later")} className="flex flex-col items-center space-y-1 text-gray-500 transition-colors hover:text-blue-600">
               <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.95-2.05l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
               </svg>
               <span className="text-xs">History</span>
             </button>
 
-            <button className="flex flex-col items-center space-y-1 text-gray-500 transition-colors hover:text-blue-600">
+            <button onClick={() => setPopupMessage("This functionality will come later")} className="flex flex-col items-center space-y-1 text-gray-500 transition-colors hover:text-blue-600">
               <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
               </svg>
               <span className="text-xs">Settings</span>
             </button>
 
-            <button className="flex flex-col items-center space-y-1 text-gray-500 transition-colors hover:text-blue-600">
+            <button onClick={() => setPopupMessage("This functionality will come later")} className="flex flex-col items-center space-y-1 text-gray-500 transition-colors hover:text-blue-600">
               <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
               </svg>
@@ -157,7 +158,17 @@ export default function App() {
                 className="w-full rounded-xl border border-gray-200 px-4 py-3 pr-24 text-gray-900 shadow-sm transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40"
                 placeholder="Enter YouTube URL here"
               />
-              <button className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg bg-blue-600 px-3 py-1 text-xs font-medium text-white shadow-sm transition hover:bg-blue-700">
+              <button
+                onClick={async () => {
+                  try {
+                    const text = await navigator.clipboard.readText();
+                    setUrl(text);
+                  } catch (err) {
+                    console.error('Failed to read clipboard:', err);
+                  }
+                }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg bg-blue-600 px-3 py-1 text-xs font-medium text-white shadow-sm transition hover:bg-blue-700"
+              >
                 Paste
               </button>
             </div>
@@ -262,6 +273,21 @@ export default function App() {
           </div>
         </div>
       </footer>
+
+      {/* Popup Modal */}
+      {popupMessage && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg max-w-sm mx-4">
+            <p className="text-sm">{popupMessage}</p>
+            <button
+              onClick={() => setPopupMessage("")}
+              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
 
     </div>
   );

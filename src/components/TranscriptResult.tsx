@@ -9,6 +9,7 @@ type Props = {
 
 export function TranscriptResult({ summary, keywords, actions, transcript }: Props) {
   const [showTranscript, setShowTranscript] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   return (
     <div className="space-y-6">
@@ -101,8 +102,19 @@ export function TranscriptResult({ summary, keywords, actions, transcript }: Pro
               </p>
             </div>
             <div className="mt-4 flex justify-end">
-              <button className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
-                Copy Transcript
+              <button
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(transcript);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 3000);
+                  } catch (err) {
+                    console.error('Failed to copy:', err);
+                  }
+                }}
+                className={`px-4 py-2 text-white text-sm rounded-lg transition-colors ${copied ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'}`}
+              >
+                {copied ? 'Transcript copied!' : 'Copy Transcript'}
               </button>
             </div>
           </div>
