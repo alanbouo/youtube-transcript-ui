@@ -1,7 +1,9 @@
 // App.tsx
 import React, { useState } from "react";
 import axios from "axios";
+import { Routes, Route, Link } from "react-router-dom";
 import { TranscriptResult } from "./components/TranscriptResult";
+import ConfidentialityPolicy from "./pages/ConfidentialityPolicy";
 
 import logoUrl from "./assets/logo.png";
 
@@ -12,7 +14,7 @@ function extractVideoId(url: string): string | null {
   return match ? match[1] : null;
 }
 
-export default function App() {
+function HomePage() {
   const [url, setUrl] = useState("");
 
   const [transcript, setTranscript] = useState("");
@@ -96,7 +98,6 @@ export default function App() {
       setLoading(false);
     }
   };
-
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 via-white to-gray-100 bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.1),_transparent_55%)]">
@@ -276,12 +277,12 @@ export default function App() {
               >
                 Contact
               </a>
-              <a
-                href="https://alanbouo.com/privacy"
+              <Link
+                to="/privacy"
                 className="transition-colors hover:text-blue-600"
               >
                 Privacy Policy
-              </a>
+              </Link>
             </nav>
           </div>
         </div>
@@ -303,5 +304,14 @@ export default function App() {
       )}
 
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/privacy" element={<ConfidentialityPolicy />} />
+    </Routes>
   );
 }
